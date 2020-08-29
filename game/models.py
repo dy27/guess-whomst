@@ -1,7 +1,7 @@
 from django.db import models
 # import math
 
-from django.contrib.postgres.fields import ArrayField
+""" from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 
@@ -52,7 +52,7 @@ class Game(models.Model):
             else:
                 state2.append('F')
 
-        return str(state1) + '\n' + str(state2)
+        return str(state1) + '\n' + str(state2) """
 
 
 # class Character(models.Model):

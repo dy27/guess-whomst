@@ -56,6 +56,10 @@ class Game(models.Model):
         return json.dumps(dict_obj)
 
     @classmethod
+    def get_game(cls, game_id):
+        return cls.objects.filter(game_id=game_id)[0]
+
+    @classmethod
     def delete_all(cls):
         cls.objects.all().delete()
 

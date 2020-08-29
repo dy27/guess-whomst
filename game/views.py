@@ -78,7 +78,7 @@ def game_msg_get(request):
     response = ""
     return response
 
-def game(request):
+def game_poll(request):
     response = ""
     return response
 
@@ -91,5 +91,9 @@ def join_game(request):
     return response
 
 def create_game(request):
+    response = ""
+    return response
+
+def join_team(request):
     response = ""
     return response

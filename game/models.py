@@ -1,166 +1,129 @@
 from django.db import models
-# import math
-
-from django.contrib.postgres.fields import ArrayField
-
-# Create your models here.
+from django.forms.models import model_to_dict
+import json
 
 
+# g = Game.create(10, names=['person1', 'person2', 'person3'])
 class Game(models.Model):
     game_id = models.IntegerField(default=0)
-    names = ArrayField(models.TextField(default=None))
-    board_size = models.IntegerField(default=24)
-    n_characters = models.IntegerField(default=0)
-    images = ArrayField(models.ImageField(default=None))
-    flipped1 = ArrayField(models.BooleanField(default=False), size=24)
-    flipped2 = ArrayField(models.BooleanField(default=False), size=24)
-    turn = models.IntegerField(default=1)
+    turn = models.IntegerField(default=0)
 
     @classmethod
-    def create(cls, game_id=0, names=None, board_size=24, images=None):
-        game = cls(game_id=game_id,
-                   names=names,
-                   board_size=board_size,
-                   images=images,
-                   flipped1=[False for _ in range(board_size)],
-                   flipped2=[False for _ in range(board_size)],
-                   turn=1)
+    def create(cls, game_id=0, names=None, images=None, size=24):
+        game = cls(game_id=game_id, turn=0)
+        game.save()
+        for i in range(2):
+            Board.create(player=i, names=names, images=images, size=size, game=game)
         return game
 
-    def flip1(self, index):
-        self.flipped1[index] = False if self.flipped1[index] else True
-
-    def flip2(self, index):
-        self.flipped1[index] = False if self.flipped1[index] else True
+    def get_board(self, player):
+        return self.board_set.filter(player=player)[0]
 
     def __str__(self):
-        state1 = []
-        for i in range(self.board_size):
-            if i >= self.n_characters:
-                state1.append('N')
-            elif self.flipped1[i]:
-                state1.append('T')
+        return str(self.get_board(0)) + '\n' + str(self.get_board(1))
+
+    def to_json(self):
+        dict_obj = model_to_dict(self)
+
+        board0 = self.get_board(0)
+        board1 = self.get_board(1)
+        dict_obj['board0'] = model_to_dict(board0)
+        dict_obj['board1'] = model_to_dict(board1)
+
+        c0 = []
+        for i in range(board0.size):
+            char_dict = model_to_dict(board0.get_character(i))
+            char_dict.pop('image')
+            c0.append(char_dict)
+
+        c1 = []
+        for i in range(board1.size):
+            char_dict = model_to_dict(board1.get_character(i))
+            char_dict.pop('image')
+            c1.append(char_dict)
+
+        # c0 = [model_to_dict(board0.get_character(i)) for i in range(board0.size)]
+        # c1 = [model_to_dict(board1.get_character(i)) for i in range(board1.size)]
+
+        dict_obj['board0']['characters'] = c0
+        dict_obj['board1']['characters'] = c1
+
+        return json.dumps(dict_obj)
+
+    @classmethod
+    def delete_all(cls):
+        cls.objects.all().delete()
+
+
+class Board(models.Model):
+    player = models.IntegerField(default=0)
+    size = models.IntegerField(default=24)
+    n_characters = models.IntegerField(default=0)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    @classmethod
+    def create(cls, player, names=None, images=None, size=24, game=None):
+
+        n_characters = 0 if names is None else len(names)
+
+        board = cls(player=player,
+                    size=size,
+                    n_characters=n_characters,
+                    game=game)
+        board.save()
+
+        if images is None and n_characters != 0:
+            images = [None for _ in range(n_characters)]
+
+        for i in range(size):
+            if i < n_characters:
+                Character.create(name=names[i],
+                                 index=i,
+                                 image=images[i],
+                                 board=board)
             else:
-                state1.append('F')
+                Character.create(name="",
+                                 index=i,
+                                 image=None,
+                                 board=board)
+        return board
 
-        state2 = []
-        for i in range(self.board_size):
-            if i >= self.n_characters:
-                state2.append('N')
-            elif self.flipped2[i]:
-                state2.append('T')
+    def get_character(self, index):
+        return self.character_set.filter(index=index)[0]
+
+    def __str__(self):
+        state = []
+        for i in range(self.size):
+            c = self.get_character(i)
+            if c.name is "":
+                state.append('N')
+            elif c.flipped:
+                state.append('T')
             else:
-                state2.append('F')
+                state.append('F')
+        return str(state)
 
-        return str(state1) + '\n' + str(state2)
 
+class Character(models.Model):
+    name = models.TextField(default="")
+    index = models.IntegerField(default=None)
+    image = models.ImageField(default=None)
+    flipped = models.BooleanField(default=True)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
 
-# class Character(models.Model):
-#     name = models.TextField(default=None)
-#     image = models.ImageField(default=None)
-#     flipped = models.BooleanField(default=False)
-#
-#     @classmethod
-#     def create(cls, name=None, image=None):
-#         character = cls(name=name,
-#                         image=image,
-#                         flipped=False)
-#         return character
-#
-#     def flip(self):
-#         self.flipped = False if self.flipped else True
-#
-#     def to_dict(self):
-#         return {'name': self.name,
-#                 'image': self.image,
-#                 'flipped': self.flipped}
-#
-#
-#
-#
-#
-#         grid = []
-#         for row in self.board:
-#             new_row = []
-#             for c in row:
-#                 if c.name is None:
-#                     new_row.append('N')
-#                 elif c.flipped:
-#                     new_row.append('T')
-#                 else:
-#                     new_row.append('F')
-#             grid.append(new_row)
-#         print(grid)
-#
-# class Board(models.Model):
-#     rows = models.IntegerField(default=4)
-#     cols = models.IntegerField(default=6)
-#     size = models.IntegerField(default=0)
-#     board = models.ManyToManyField(Character)
-#     # board = models.ForeignKey(Character, on_delete=models.CASCADE)
-#
-#     @classmethod
-#     def create(cls, names=None, images=None, shape=(4, 6)):
-#
-#         if shape is None:
-#             size = len(names) if names is not None else 0
-#             cols = math.ceil(math.sqrt(size))
-#             rows = math.ceil(size / cols)
-#         else:
-#             rows = shape[0]
-#             cols = shape[1]
-#             size = len(names) if names is not None else 0
-#
-#         if names is None:
-#             names = [None for _ in range(size)]
-#         if images is None:
-#             images = [None for _ in range(size)]
-#
-#         board = [Character() for _ in range(rows*cols)]
-#
-#         for i in range(rows * cols):
-#             if i < size:
-#                 board[i].name = names[i]
-#                 board[i].image = images[i]
-#             else:
-#                 board[i].name = None
-#                 board[i].image = None
-#
-#         return cls(rows=rows,
-#                    cols=cols,
-#                    size=size,
-#                    board=board)
-#
-#     def flip(self, row, col):
-#         self.board[row][col].flip()
-#
-#     def print_board(self):
-#         grid = []
-#         for row in self.board:
-#             new_row = []
-#             for c in row:
-#                 if c.name is None:
-#                     new_row.append('N')
-#                 elif c.flipped:
-#                     new_row.append('T')
-#                 else:
-#                     new_row.append('F')
-#             grid.append(new_row)
-#         print(grid)
-#
-#     def __str__(self):
-#         grid = []
-#         for row in self.board:
-#             new_row = []
-#             for c in row:
-#                 if c.name is None:
-#                     new_row.append('N')
-#                 elif c.flipped:
-#                     new_row.append('T')
-#                 else:
-#                     new_row.append('F')
-#             grid.append(new_row)
-#         return str(grid)
+    @classmethod
+    def create(cls, name=None, index=None, image=None, flipped=True, board=None):
+        character = cls(name=name,
+                        index=index,
+                        image=image,
+                        flipped=flipped,
+                        board=board)
+        character.save()
+        return character
+
+    def flip(self):
+        self.flipped = False if self.flipped else True
+        self.save()
 
 
 # class Board(models.Model):
@@ -243,8 +206,59 @@ class Game(models.Model):
 #         return str(grid)
 
 
+
+
+
+
+
+
+
+
+
 # class Game(models.Model):
-#     def __init__(self, game_id):
-#         self.id = game_id
-#         self.board1 = Board()
-#         self.board2 = Board()
+#     game_id = models.IntegerField(default=0)
+#     names = ArrayField(models.TextField(default=""), size=24)
+#     board_size = models.IntegerField(default=24)
+#     n_characters = models.IntegerField(default=0)
+#     # images = ArrayField(models.ImageField(default=None))
+#     # flipped1 = ArrayField(models.BooleanField(default=False), size=24)
+#     # flipped2 = ArrayField(models.BooleanField(default=False), size=24)
+#     turn = models.IntegerField(default=1)
+
+# @classmethod
+# def create(cls, game_id=0, names=None, board_size=24, images=None):
+#     game = cls(game_id=game_id,
+#                names=names,
+#                board_size=board_size,
+#                images=images,
+#                flipped1=[False for _ in range(board_size)],
+#                flipped2=[False for _ in range(board_size)],
+#                turn=1)
+#     return game
+#
+# def flip1(self, index):
+#     self.flipped1[index] = False if self.flipped1[index] else True
+#
+# def flip2(self, index):
+#     self.flipped1[index] = False if self.flipped1[index] else True
+#
+# def __str__(self):
+#     state1 = []
+#     for i in range(self.board_size):
+#         if i >= self.n_characters:
+#             state1.append('N')
+#         elif self.flipped1[i]:
+#             state1.append('T')
+#         else:
+#             state1.append('F')
+#
+#     state2 = []
+#     for i in range(self.board_size):
+#         if i >= self.n_characters:
+#             state2.append('N')
+#         elif self.flipped2[i]:
+#             state2.append('T')
+#         else:
+#             state2.append('F')
+#
+#     return str(state1) + '\n' + str(state2)

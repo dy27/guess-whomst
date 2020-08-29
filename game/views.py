@@ -73,7 +73,8 @@ def json_to_dict(json_str, expected_fields=[]):
 
 def check_game_id(game_id):
     #TODO check if game_id is in database
-    return True
+    query = Game.objects.filter(game_id=game_id)
+    return True if len(query) != 0 else False
 
 
 def game_json_from_id(game_id):

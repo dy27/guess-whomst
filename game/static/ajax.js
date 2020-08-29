@@ -25,7 +25,7 @@ document.body.onkeyup = function(event){
         };
 
         request = {"user_id":user_id, "content" : question_box._value}
-        post_request("game/" + game_id + "/msg/send", call_back, "application/json", JSON.stringify(request));
+        post_request(game_id + "/msg/send", call_back, "application/json", JSON.stringify(request));
 
 
     }

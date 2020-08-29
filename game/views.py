@@ -6,7 +6,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
-from game.models import Game, Board, Character
+from game.models import Game, Character
 
 # def hello(request):
 #     return HttpResponse("Hello, world. You're at the polls index.")

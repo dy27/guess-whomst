@@ -1,3 +1,7 @@
+user_id = 0; //TODO
+
+
+/// Reference
 CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, height, roundedness) {
   const radiansInCircle = 2 * Math.PI;
   const halfRadians = (2 * Math.PI)/2;
@@ -13,6 +17,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, heig
   this.arc(x + width - roundedness, y + roundedness, roundedness, 0, -quarterRadians, true);
   this.lineTo(x + roundedness, y);
 }
+
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -70,7 +75,7 @@ ctx.fillStyle = "black";
 ctx.fillText("Question:", x_elements, 170);
 
 // Question box
-var input = new CanvasInput({
+question_box = new CanvasInput({
     canvas: document.getElementById('canvas'),
     fontSize: 18,
     x: x_elements,
@@ -119,3 +124,20 @@ function mouseFunction(event) {
         }
     }
 }
+
+
+document.body.onkeyup = function(event){
+
+    var k = event.key || event.keyCode;
+    if(k === "Enter") {
+        var httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                console.log("Sent message : " + this.responseText);
+            }
+        };
+
+        httpRequest.open("POST", "game/" + user_id + "/msg/send", true);
+        httpRequest.send("user_id=" + user_id+"&content=" + question_box._value);       
+    }
+};

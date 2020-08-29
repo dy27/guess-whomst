@@ -21,6 +21,7 @@ class Button extends Interactive {
     }
 
     action () {
+
         if (this.active == true) {
             this.colour = "CornflowerBlue";
             this.active = false;

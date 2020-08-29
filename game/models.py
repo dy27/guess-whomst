@@ -48,6 +48,10 @@ class Game(models.Model):
     def get_character(self, index):
         return self.character_set.filter(index=index)[0]
 
+    def set_ready(self):
+        self.game_ready = 1
+        self.save()
+
     @classmethod
     def get_game(cls, game_id):
         return cls.objects.filter(game_id=game_id)[0]

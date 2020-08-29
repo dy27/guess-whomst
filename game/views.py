@@ -65,7 +65,6 @@ def is_valid_game_id(id):
 def game_msg_send(request):
     response = ""
     username = request.POST.get('username', None)
-    render
     return response
 
 

@@ -75,3 +75,17 @@ class Character(models.Model):
                         game=game)
         character.save()
         return character
+
+
+class Message(models.Model):
+    name = models.TextField(default="")
+    user_id = models.IntegerField(default=0)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+    @classmethod
+    def create(cls, name=None, user_id=None, game=None):
+        character = cls(name=name,
+                        user_id=user_id,
+                        game=game)
+        character.save()
+        return character

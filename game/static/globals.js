@@ -7,6 +7,11 @@ local_data = {
 
 };
 
+player_number = -1;
+msgs = []
+active_msg = ""
+chatMsg = {"_value" : ""}
+
 function update_local_data(new_data) {
     local_data = new_data
 }

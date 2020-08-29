@@ -61,6 +61,7 @@ def is_valid_game_id(id):
 
 
 ################## Random helper functions
+the_msgs = []
 
 
 ### json_to_dict for responses
@@ -100,6 +101,9 @@ def game_msg_send(request, game_id):
     json_dict = json_to_dict(request.body, ["user_id","content"])
 
     print("game_msg_send: Received msg from %s : %s" % (json_dict["user_id"], json_dict["content"]))
+    
+    #Game.get_game(game_id)
+    the_msgs.append({"user_id": int(json_dict["user_id"]), "content" : json_dict["content"]})
 
     return HttpResponse("Success!") #TODO
 
@@ -109,10 +113,9 @@ def game_msg_get_all(request, game_id):
 
     print("game_msg_get_all: Sending all msgs for game: %s" % (game_id))
 
-    #messages = {[{"TEST_msg" : {"user_id":"blue", "content":"Hello there", "msg_id":294}}]} #TODO un-mock
-    messages = '[{"TEST_msg" : {"user_id":"blue", "content":"Hello there", "msg_id":294}}]' #TODO un-mock
+    msgs_json = json.dumps(the_msgs)
 
-    return HttpResponse(messages, content_type="application/json")
+    return HttpResponse(msgs_json, content_type="application/json")
 
 
 def game_msg_get(request, game_id):
@@ -162,36 +165,26 @@ def join_game(request, game_id):
 
     print("join_game: Received join for game id %s" % (game_id))
 
-    Game.set_ready() # i.e. there is more than one player now
+    Game.get_game(game_id).set_ready() # i.e. there is more than one player now
 
     return HttpResponse("Joined!")
 
 
 # Start game button is pressed, leave start menu screen
-def start_game(request, game_id):
+def start_game(request):
 
-    if not check_game_id(game_id):
-        return HttpResponse("Invalid game ID!")
-
-    json_dict = json_to_dict(request.body, ["num_characters"])
-
-    print("start_game: Received start game from %d with %d characters" % (game_id,json_dict["num_characters"]))
-
-    return HttpResponse("Todo!")
-
-
-def create_game(request):
-
-    print("create_game: Received create game. Creating database entry...")
     rnd_id = random.randint(0,10000)
 
     while check_game_id(rnd_id):
         rnd_id = random.randint(0,10000)
 
-    game_object = Game.create(rnd_id)
+    json_dict = json_to_dict(request.body, ["num_characters"])
+
+    print("start_game: Received start game id %d with %d characters" % (rnd_id,json_dict["num_characters"]))
+
+    game_object = Game.create(rnd_id,[""]*json_dict["num_characters"])    
 
     return HttpResponse(game_object.to_json(), content_type="application/json")
-
 
 
 

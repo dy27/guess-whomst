@@ -313,32 +313,35 @@ function mouseFunction(event) {
         if (reset_button.onpress(event) == true) {
 
         }
+        /*
+        if (join_button.onpress(event) == true) {
+
+            player_number = 1;
+        }
+        */
         if (start_button.onpress(event) == true) {
-            
-            // Check more than one player has joined:
-            if (local_data["game_ready"] == 0) {
-                alert("There must be two players or more to play!");
-            } else {
 
-                var call_back = function() {
-                    if(this.readyState == 4 && this.status == 200) {
-                        console.log("Sent message : " + this.responseText);
-                        if(this.responseText === "Joined!") {
-                            //TODO successful join
-                        }
-                    }
-                };
-
-                if(local_data["game_id"] != -1) { // If a game has been created i.e. an id has been assigned
-
-                    request_data = {"num_characters" : whomsts_no._value};
-
-                    post_request("game/"+local_data["game_id"]+"start/", call_back, "application/json", JSON.stringify(request_data));
-                    gameState = 1;
-                    drawGameBoard();
+            // Request to create the game:
+            var call_back = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    //console.log("Client : New game data ~~~ \n" + this.responseText);
+                    update_local_data(JSON.parse(this.responseText));
+                    alert("Your game ID is: " + local_data["game_id"] + ".\nTo join the game go to http://127.0.0.1:8000/game/"+local_data["game_id"]+"/join/");
+                    player_number = 0;// The initial player
                 }
+            };
+
+            var num = parseInt(whomsts_no._value);
+            if(isNaN(num)) {
+                num = 6;
             }
 
+            request_data = {"num_characters" : num};
+
+            post_request("game/start", call_back, "application/json", JSON.stringify(request_data));
+            gameState = 1;
+            drawGameBoard();
+            
         }
 
     } else if (gameState == 1) {
@@ -448,20 +451,3 @@ function mouseFunction(event) {
     }
 }
 
-
-document.body.onkeyup = function(event){
-
-    var k = event.key || event.keyCode;
-
-    if(k === "Enter") {
-        var httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function() {
-            if(this.readyState == 4 && this.status == 200) {
-                console.log("Sent message : " + this.responseText);
-            }
-        };
-
-        httpRequest.open("POST", "game/" + user_id + "/msg/send", true);
-        httpRequest.send("user_id=" + user_id+"&content=" + question_box._value);
-    }
-};

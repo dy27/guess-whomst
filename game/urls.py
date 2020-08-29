@@ -14,6 +14,6 @@ urlpatterns = [
     
     path(r'join/$/', views.join_game, name='join_game'),
     path(r'create', views.game_msg_send, name='game_msg_send'),
-
+    
     path(r'join/$/team', views.join_team, name='join_team')
 ]

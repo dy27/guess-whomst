@@ -26,7 +26,7 @@ class Person extends Interactive {
 
     action () {
         if (this.active == true) {
-            this.colour = "Gainsboro";
+            this.colour = "CornflowerBlue";
             this.active = false;
         } else {
             this.colour = "AliceBlue";

@@ -184,3 +184,11 @@ def join_team(request, game_id):
 
 
 
+
+
+
+def send_img(request, game_id):
+    pass
+
+def send_img_metadata(request, game_id):
+    pass

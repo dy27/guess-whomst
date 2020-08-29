@@ -16,12 +16,16 @@ class Person extends Interactive {
         ctx.fill();
         ctx.closePath();
 
-        ctx.beginPath();
-        ctx.roundedRectangle(this.x, this.y + 20 + this.height, this.name_width, this.name_height, 6);
-        ctx.stroke();
-        ctx.fillStyle = this.colour;
-        ctx.fill();
-        ctx.closePath();
+        if (gameState == 1 || gameState == 2) {
+            ctx.beginPath();
+            ctx.roundedRectangle(this.x, this.y + 20 + this.height, this.name_width, this.name_height, 6);
+            ctx.stroke();
+            ctx.fillStyle = this.colour;
+            ctx.fill();
+            ctx.closePath();
+
+            
+        }
     }
 
     action () {

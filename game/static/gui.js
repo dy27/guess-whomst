@@ -1,8 +1,6 @@
 // Function to draw a rounded rectangle
 user_id = 0; //TODO
 
-
-
 /// Reference
 CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, height, roundedness) {
   const radiansInCircle = 2 * Math.PI;
@@ -77,15 +75,55 @@ for (var r = 0; r < 4; r++) {
     }
 }
 
+var nameTagsEntries = new Array();
+
 function draw_whomsts(){
-    for (var r = 0; r < numFaces; r++) {
-        pict_objects[r].draw();
+    for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 6; c++) {
+            if (6 * r + c < numFaces) {
+                pict_objects[6 * r + c].draw();
+            }
+        }
     }
 }
 
+
+function create_name_texts(){
+
+    for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 6; c++) {
+            if (6 * r + c < numFaces) {
+
+                //if (gameState == 0) {
+                    nameTagsEntries[6*r+c] = new CanvasInput({
+                        canvas: document.getElementById('canvas'),
+                        fontSize: 12,
+                        x: c*100 + 27,
+                        y: r*160+20+170,
+                        width: 54,
+                        height: 12,
+                        backgroundColor: "Azure",
+                        borderColor: "CornflowerBlue",
+                        placeHolder: 'Name...',
+                        placeHolderColor: "gray",
+                        innerShadow: "1px 1px 0px rgba(0,0,0,0)",
+                        borderRadius: 3,
+                        onsubmit: function (){
+                            pict_objects[6 * r + c].name = nameTagsEntries[6*r+c]._value;
+                        }
+
+                    });
+                //}
+            } else {
+                nameTagsEntries[6*r+c].destroy();
+            }
+
+        }
+    }
+}
 if (gameState == 0) {
     drawStartBoard();
-} else if (gameState == 1) {
+} else if (gameState > 0) {
     drawGameBoard();
 }
 
@@ -99,6 +137,7 @@ function drawStartBoard() {
         question_box.destroy();
         chatMsg.destroy();
     }
+    create_name_texts();
     // Vertical line
     ctx.beginPath();
     ctx.moveTo(644, 0);
@@ -113,9 +152,7 @@ function drawStartBoard() {
     ctx.fillText("Guess Whomst?!", 155, 40);
 
     // Draw the person objects (pictures + nametags)
-    for (var r = 0; r < numFaces; r++) {
-        pict_objects[r].draw();
-    }
+    draw_whomsts();
 
     var x_elements = 670;
 
@@ -152,8 +189,12 @@ function drawStartBoard() {
                 ctx.font = "40px Arial";
                 ctx.fillStyle = "CornflowerBlue";
                 ctx.fillText("Guess Whomst?!", 155, 40);
+                for (var i = 0; i < numFaces; i++) {
+                    nameTagsEntries[i].destroy();
+                }
                 numFaces = whomsts_no._value;
                 draw_whomsts();
+                create_name_texts();
             }
         }
 
@@ -174,8 +215,6 @@ function drawStartBoard() {
     // Start button
     start_button.draw();
 }
-
-
 
 
 function drawString(ctx, text, posX, posY, textColor, rotation, font, fontSize) {
@@ -200,7 +239,11 @@ function drawGameBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white"; // Background colour
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     whomsts_no.destroy();
+    for (var i = 0; i < numFaces; i++) {
+        nameTagsEntries[i].destroy();
+    }
     played = 1;
 
     // Vertical line
@@ -310,10 +353,17 @@ function reset_tiles(){
 function mouseFunction(event) {
 
     if (gameState == 0) {
+
         if (reset_button.onpress(event) == true) {
 
         }
         if (start_button.onpress(event) == true) {
+            //alert(numFaces);
+            //alert(nameTagsEntries.length);
+            // for (var i = 0; i < nameTagsEntries.length; i++) {
+            //     nameTagsEntries[i].destroy();
+            // }
+            //alert('hello');
             gameState = 1;
             drawGameBoard();
 
@@ -328,7 +378,7 @@ function mouseFunction(event) {
         }
 
     } else if (gameState == 1) {
-        for (var p = 0; p < 24; p++) {
+        for (var p = 0; p < numFaces; p++) {
             if (pict_objects[p].onpress(event) == true) {
                 break;
             }
@@ -346,6 +396,8 @@ function mouseFunction(event) {
 
                 } else if (o == 2){
                     gameState = 0;
+
+                    numFaces = 24;
                     start_button.colour = "Azure";
                     reset_tiles();
                     drawStartBoard();
@@ -417,6 +469,9 @@ function mouseFunction(event) {
 
         } else if (action_buttons[2].onpress(event) == true){
             gameState = 0;
+
+            numFaces = 24;
+
             start_button.colour = "Azure";
             reset_tiles();
             drawStartBoard();

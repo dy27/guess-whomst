@@ -317,6 +317,14 @@ function mouseFunction(event) {
             gameState = 1;
             drawGameBoard();
 
+            var call_back = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log("Sent message : " + this.responseText);
+                }
+            };
+
+            request = {"user_id":user_id, "content" : question_box._value}
+            post_request("start", call_back, "application/json", "");
         }
 
     } else if (gameState == 1) {
@@ -341,6 +349,18 @@ function mouseFunction(event) {
                     start_button.colour = "Azure";
                     reset_tiles();
                     drawStartBoard();
+
+                    var call_back = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            console.log("Sent message : " + this.responseText);
+                        }
+                    };
+
+                    request = {"user_id":user_id, "content" : ""}
+                    post_request("game/" + game_id + "/quit", call_back, "application/json", JSON.stringify(request));
+
+
+                // End turn button
                 } else {
                     gameState = 2;
                     setTimeout(function(){
@@ -348,6 +368,16 @@ function mouseFunction(event) {
                         action_buttons[0].active = true;
                         action_buttons[0].draw();
                     },100);
+
+                    var call_back = function() {
+                        if(this.readyState == 4 && this.status == 200) {
+                            console.log("Sent message : " + this.responseText);
+                        }
+                    };
+
+                    request = {"user_id":user_id, "content" : ""}
+                    post_request("game/" + game_id + "/endQuestionTurn", call_back, "application/json", JSON.stringify(request));
+
                 }
                 break;
             }
@@ -361,6 +391,17 @@ function mouseFunction(event) {
                     options[o].active = true;
                     options[o].draw();
                 },100);
+
+                var call_back = function() {
+                    if(this.readyState == 4 && this.status == 200) {
+                        console.log("Sent message : " + this.responseText);
+                    }
+                };
+
+                request = {"user_id":user_id, "content" : o} // 0 = Yes, 1 = No, 2 = Unsure
+                post_request("game/" + game_id + "/endQuestionTurn", call_back, "application/json", JSON.stringify(request));
+
+
                 break;
             }
         }
@@ -379,6 +420,16 @@ function mouseFunction(event) {
             start_button.colour = "Azure";
             reset_tiles();
             drawStartBoard();
+
+            var call_back = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log("Sent message : " + this.responseText);
+                }
+            };
+
+            request = {"user_id":user_id, "content" : ""}
+            post_request("game/" + game_id + "/quit", call_back, "application/json", JSON.stringify(request));
+
         }
     }
 }

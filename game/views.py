@@ -96,7 +96,7 @@ def game_msg_send(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["user_id","content"])
-    
+
     print("game_msg_send: Received msg from %s : %s" % (json_dict["user_id"], json_dict["content"]))
 
     return HttpResponse("Success!") #TODO
@@ -128,7 +128,7 @@ def game_msg_get(request, game_id):
         msg = messages[msg_id]
         print("game_msg_get: Sending msg (%d) for game: %s" % (msg_id, game_id)) #TODO log msg contents
         msg_json = json.dumps(msg)
-        
+
         return HttpResponse(msg_json, content_type="application/json")
 
 def game_poll(request, game_id):
@@ -137,15 +137,15 @@ def game_poll(request, game_id):
     game_json = game_json_from_id(game_id) #TODO un-mock
 
     print("game_poll: Sending game data for game: %s" % (game_id))
-    
+
     return HttpResponse(game_json, content_type="application/json")
 
 
 def game_guess(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
-    
+
     json_dict = json_to_dict(request.body, ["user_id","face_id"]) # face_id is their guess
-    
+
     print("game_guess: Received guess from %s : face with id %d" % (json_dict["user_id"], json_dict["face_id"]))
 
     if check_win(json_dict["face_id"], game_id):
@@ -153,20 +153,21 @@ def game_guess(request, game_id):
         #TODO Win state!
     else:
         return HttpResponse("incorrect")
-        
+
 
 def join_game(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["user_id","content"])
-    
+
     print("join_game: Received join from %s for game id %s" % (json_dict["user_id"], game_id))
 
     return HttpResponse("Todo!")
 
+
 def create_game(request):
     json_dict = json_to_dict(request.body, ["user_id"])
-    
+
     print("join_game: Received create game from %s" % (json_dict["user_id"]))
 
     return HttpResponse("Todo!")
@@ -175,7 +176,38 @@ def join_team(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["user_id"])
-    
+
     print("join_game: Received join from %s for game id %s" % (json_dict["user_id"], game_id))
+
+    return HttpResponse("Todo!")
+
+# Start game button is pressed, leave start menu screen
+def start_game(request):
+
+    print("join_game: Received start game")
+
+    return HttpResponse("Todo!")
+
+# End the turn for player who asked the current question and has finished flipping tiles
+def end_question_turn(request):
+    json_dict = json_to_dict(request.body, ["user_id"])
+
+    print("join_game: Received end question turn from %s" % (json_dict["user_id"]))
+
+    return HttpResponse("Todo!")
+
+# Quit the current game and return to main menu screen
+def quit_game(request):
+    json_dict = json_to_dict(request.body, ["user_id"])
+
+    print("join_game: Received quit game from %s" % (json_dict["user_id"]))
+
+    return HttpResponse("Todo!")
+
+# End turn for player that must answer the current question
+def end_answer_turn(request):
+    json_dict = json_to_dict(request.body, ["user_id"])
+
+    print("join_game: Received end answer turn from %s" % (json_dict["user_id"]))
 
     return HttpResponse("Todo!")

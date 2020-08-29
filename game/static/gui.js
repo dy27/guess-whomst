@@ -1,3 +1,7 @@
+// Function to draw a rounded rectangle
+user_id = 0; //TODO
+
+
 
 /// Reference
 CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, height, roundedness) {
@@ -17,6 +21,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, heig
 }
 
 var gameState = 0; // 0 = start menu, 1 = asking question, 2 = answering question
+var played = 0;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -55,20 +60,28 @@ function handleImage(e){
 // Detect mouse press
 canvas.addEventListener("click", mouseFunction, false);
 
-// Number of faces
-var numFaces = 24;
-
 // Create person objects
 var pict_objects = new Array();
-for (var r = 0; r < 6; r++) {
-    for (var c = 0; c < 4; c++) {
-        pict_objects[4*r + c] = new Person("random", r * 100, c * 160, "AliceBlue", "None", ctx);
-    }
-}
 var options = new Array();
 var action_buttons = new Array();
 var reset_button = new Button(145, 40, 855, 320, ctx, "Reset");
 var start_button = new Button(337, 45, 670, 630, ctx, "Start Button");
+var whomsts_no;
+var question_box;
+var chatMsg;
+
+var numFaces = 24;
+for (var r = 0; r < 4; r++) {
+    for (var c = 0; c < 6; c++) {
+        pict_objects[6 * r + c] = new Person("random", c*100, r*160, "AliceBlue", "None", ctx);
+    }
+}
+
+function draw_whomsts(){
+    for (var r = 0; r < numFaces; r++) {
+        pict_objects[r].draw();
+    }
+}
 
 if (gameState == 0) {
     drawStartBoard();
@@ -76,11 +89,16 @@ if (gameState == 0) {
     drawGameBoard();
 }
 
+
 function drawStartBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white"; // Background colour
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    if (played == 1){
+        question_box.destroy();
+        chatMsg.destroy();
+    }
     // Vertical line
     ctx.beginPath();
     ctx.moveTo(644, 0);
@@ -110,7 +128,7 @@ function drawStartBoard() {
     ctx.fillText("Number of Whomsts (Max 24, Min 6):", x_elements, 300);
 
     // Number of Whomsts enter box
-    var whomsts_no = new CanvasInput({
+    whomsts_no = new CanvasInput({
         canvas: document.getElementById('canvas'),
         fontSize: 18,
         x: x_elements,
@@ -122,7 +140,23 @@ function drawStartBoard() {
         placeHolder: 'Enter here...',
         placeHolderColor: "gray",
         innerShadow: "1px 1px 0px rgba(0,0,0,0)",
-        borderRadius: 10
+        borderRadius: 10,
+        onsubmit: function (){
+
+            if (whomsts_no._value < 6 || whomsts_no._value > 24) {
+                alert('Invalid number of whomsts, Try again!');
+            } else {
+                ctx.clearRect(0, 0, 640, canvas.height);
+                ctx.fillStyle = "white"; // Background colour
+                ctx.fillRect(0, 0, 640, canvas.height);
+                ctx.font = "40px Arial";
+                ctx.fillStyle = "CornflowerBlue";
+                ctx.fillText("Guess Whomst?!", 155, 40);
+                numFaces = whomsts_no._value;
+                draw_whomsts();
+            }
+        }
+
     });
 
     // Reset button
@@ -135,12 +169,14 @@ function drawStartBoard() {
     // Players text
     ctx.font = "20px Arial";
     ctx.fillStyle = "CornflowerBlue";
-    ctx.fillText("Players:", x_elements + 50, 430);
+    ctx.fillText("Players:", x_elements + 10, 430);
 
     // Start button
     start_button.draw();
-
 }
+
+
+
 
 function drawString(ctx, text, posX, posY, textColor, rotation, font, fontSize) {
 	var lines = text.split("\n");
@@ -164,6 +200,8 @@ function drawGameBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white"; // Background colour
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    whomsts_no.destroy();
+    played = 1;
 
     // Vertical line
     ctx.beginPath();
@@ -205,7 +243,7 @@ function drawGameBoard() {
     ctx.fillText("Question:", x_elements, 170);
 
     // Question box
-    var input = new CanvasInput({
+    question_box = new CanvasInput({
         canvas: document.getElementById('canvas'),
         fontSize: 18,
         x: x_elements,
@@ -234,7 +272,6 @@ function drawGameBoard() {
     }
 
     // Game buttons
-
     var button_texts = new Array("End Turn", "Reset", "Quit");
     for (var o = 0; o < 3; o++) {
         action_buttons[o] = new Button(84, 45, x_elements + o * 126, 650, ctx, button_texts[o]);
@@ -242,7 +279,7 @@ function drawGameBoard() {
     }
 
     // Chat message box
-    var chatMsg = new CanvasInput({
+    chatMsg = new CanvasInput({
         canvas: document.getElementById('canvas'),
         fontSize: 18,
         x: x_elements,
@@ -262,6 +299,13 @@ function drawGameBoard() {
     chat_box.draw();
 }
 
+function reset_tiles(){
+    for (var r = 0; r < numFaces; r++) {
+        pict_objects[r].active = true;
+        pict_objects[r].colour = "AliceBlue";
+    }
+}
+
 // Function to detect and act on mouse clicks
 function mouseFunction(event) {
 
@@ -275,17 +319,84 @@ function mouseFunction(event) {
 
         }
 
-    } else if (gameState == 1 || gameState == 2) {
+    } else if (gameState == 1) {
         for (var p = 0; p < 24; p++) {
             if (pict_objects[p].onpress(event) == true) {
                 break;
             }
         }
         for (var o = 0; o < 3; o++) {
+            if (action_buttons[o].onpress(event) == true) {
+                if (o == 1){
+                    reset_tiles();
+                    draw_whomsts();
+                    setTimeout(function(){
+                        action_buttons[1].colour = "Azure";
+                        action_buttons[1].active = true;
+                        action_buttons[1].draw();
+                    },100);
 
-            if (options[o].onpress(event) == true || action_buttons[o].onpress(event) == true) {
+                } else if (o == 2){
+                    gameState = 0;
+                    start_button.colour = "Azure";
+                    reset_tiles();
+                    drawStartBoard();
+                } else {
+                    gameState = 2;
+                    setTimeout(function(){
+                        action_buttons[0].colour = "Azure";
+                        action_buttons[0].active = true;
+                        action_buttons[0].draw();
+                    },100);
+                }
                 break;
             }
         }
+    } else if (gameState == 2){
+        for (var o = 0; o < 3; o++) {
+            if (options[o].onpress(event) == true) {
+                gameState = 1;
+                setTimeout(function(){
+                    options[o].colour = "Azure";
+                    options[o].active = true;
+                    options[o].draw();
+                },100);
+                break;
+            }
+        }
+        if (action_buttons[1].onpress(event) == true) {
+
+            reset_tiles();
+            draw_whomsts();
+            setTimeout(function(){
+                action_buttons[1].colour = "Azure";
+                action_buttons[1].active = true;
+                action_buttons[1].draw();
+            },100);
+
+        } else if (action_buttons[2].onpress(event) == true){
+            gameState = 0;
+            start_button.colour = "Azure";
+            reset_tiles();
+            drawStartBoard();
+        }
     }
 }
+
+
+document.body.onkeyup = function(event){
+
+    var k = event.key || event.keyCode;
+
+    if(k === "Enter") {
+        var httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function() {
+            if(this.readyState == 4 && this.status == 200) {
+                console.log("Sent message : " + this.responseText);
+            }
+        };
+
+        httpRequest.open("POST", "game/" + user_id + "/msg/send", true);
+        httpRequest.send("user_id=" + user_id+"&content=" + question_box._value);
+    }
+};

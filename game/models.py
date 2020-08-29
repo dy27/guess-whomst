@@ -1,59 +1,51 @@
 from django.db import models
-# import math
-
-
-
-# Create your models here.
 from django.forms.models import model_to_dict
 import json
 
 
-# g = Game.create(10, names=['person1', 'person2', 'person3'])
 class Game(models.Model):
     game_id = models.IntegerField(default=0)
     turn = models.IntegerField(default=0)
+    size = models.IntegerField(default=0)
 
     @classmethod
-    def create(cls, game_id=0, names=None, images=None, size=24):
-        game = cls(game_id=game_id, turn=0)
+    def create(cls, game_id, names, images=None):
+        size = len(names)
+        game = cls(game_id=game_id,
+                   turn=0,
+                   size=size)
         game.save()
-        for i in range(2):
-            Board.create(player=i, names=names, images=images, size=size, game=game)
+
+        if images is None and size != 0:
+            images = [None for _ in range(size)]
+
+        for i in range(size):
+            if i < size:
+                Character.create(name=names[i],
+                                 index=i,
+                                 image=images[i],
+                                 game=game)
+            else:
+                Character.create(name="",
+                                 index=i,
+                                 image=None,
+                                 game=game)
         return game
-
-    def get_board(self, player):
-        return self.board_set.filter(player=player)[0]
-
-    def __str__(self):
-        return str(self.get_board(0)) + '\n' + str(self.get_board(1))
 
     def to_json(self):
         dict_obj = model_to_dict(self)
 
-        board0 = self.get_board(0)
-        board1 = self.get_board(1)
-        dict_obj['board0'] = model_to_dict(board0)
-        dict_obj['board1'] = model_to_dict(board1)
-
-        c0 = []
-        for i in range(board0.size):
-            char_dict = model_to_dict(board0.get_character(i))
+        characters = []
+        for i in range(self.size):
+            char_dict = model_to_dict(self.get_character(i))
             char_dict.pop('image')
-            c0.append(char_dict)
+            characters.append(char_dict)
 
-        c1 = []
-        for i in range(board1.size):
-            char_dict = model_to_dict(board1.get_character(i))
-            char_dict.pop('image')
-            c1.append(char_dict)
-
-        # c0 = [model_to_dict(board0.get_character(i)) for i in range(board0.size)]
-        # c1 = [model_to_dict(board1.get_character(i)) for i in range(board1.size)]
-
-        dict_obj['board0']['characters'] = c0
-        dict_obj['board1']['characters'] = c1
-
+        dict_obj['characters'] = characters
         return json.dumps(dict_obj)
+
+    def get_character(self, index):
+        return self.character_set.filter(index=index)[0]
 
     @classmethod
     def get_game(cls, game_id):
@@ -64,75 +56,149 @@ class Game(models.Model):
         cls.objects.all().delete()
 
 
-class Board(models.Model):
-    player = models.IntegerField(default=0)
-    size = models.IntegerField(default=24)
-    n_characters = models.IntegerField(default=0)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
-
-    @classmethod
-    def create(cls, player, names=None, images=None, size=24, game=None):
-
-        n_characters = 0 if names is None else len(names)
-
-        board = cls(player=player,
-                    size=size,
-                    n_characters=n_characters,
-                    game=game)
-        board.save()
-
-        if images is None and n_characters != 0:
-            images = [None for _ in range(n_characters)]
-
-        for i in range(size):
-            if i < n_characters:
-                Character.create(name=names[i],
-                                 index=i,
-                                 image=images[i],
-                                 board=board)
-            else:
-                Character.create(name="",
-                                 index=i,
-                                 image=None,
-                                 board=board)
-        return board
-
-    def get_character(self, index):
-        return self.character_set.filter(index=index)[0]
-
-    def __str__(self):
-        state = []
-        for i in range(self.size):
-            c = self.get_character(i)
-            if c.name is "":
-                state.append('N')
-            elif c.flipped:
-                state.append('T')
-            else:
-                state.append('F')
-        return str(state)
-
-
 class Character(models.Model):
     name = models.TextField(default="")
     index = models.IntegerField(default=None)
     image = models.ImageField(default=None)
-    flipped = models.BooleanField(default=True)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, name=None, index=None, image=None, flipped=True, board=None):
+    def create(cls, name=None, index=None, image=None, game=None):
         character = cls(name=name,
                         index=index,
                         image=image,
-                        flipped=flipped,
-                        board=board)
+                        game=game)
         character.save()
         return character
 
-    def flip(self):
-        self.flipped = False if self.flipped else True
-        self.save()
+
+
+
+# g = Game.create(10, names=['person1', 'person2', 'person3'])
+# class Game(models.Model):
+#     game_id = models.IntegerField(default=0)
+#     turn = models.IntegerField(default=0)
+#
+#     @classmethod
+#     def create(cls, game_id=0, names=None, images=None, size=24):
+#         game = cls(game_id=game_id, turn=0)
+#         game.save()
+#         for i in range(2):
+#             Board.create(player=i, names=names, images=images, size=size, game=game)
+#         return game
+#
+#     def get_board(self, player):
+#         return self.board_set.filter(player=player)[0]
+#
+#     def __str__(self):
+#         return str(self.get_board(0)) + '\n' + str(self.get_board(1))
+#
+#     def to_json(self):
+#         dict_obj = model_to_dict(self)
+#
+#         board0 = self.get_board(0)
+#         board1 = self.get_board(1)
+#         dict_obj['board0'] = model_to_dict(board0)
+#         dict_obj['board1'] = model_to_dict(board1)
+#
+#         c0 = []
+#         for i in range(board0.size):
+#             char_dict = model_to_dict(board0.get_character(i))
+#             char_dict.pop('image')
+#             c0.append(char_dict)
+#
+#         c1 = []
+#         for i in range(board1.size):
+#             char_dict = model_to_dict(board1.get_character(i))
+#             char_dict.pop('image')
+#             c1.append(char_dict)
+#
+#         # c0 = [model_to_dict(board0.get_character(i)) for i in range(board0.size)]
+#         # c1 = [model_to_dict(board1.get_character(i)) for i in range(board1.size)]
+#
+#         dict_obj['board0']['characters'] = c0
+#         dict_obj['board1']['characters'] = c1
+#
+#         return json.dumps(dict_obj)
+#
+#     @classmethod
+#     def get_game(cls, game_id):
+#         return cls.objects.filter(game_id=game_id)[0]
+#
+#     @classmethod
+#     def delete_all(cls):
+#         cls.objects.all().delete()
+#
+#
+# class Board(models.Model):
+#     player = models.IntegerField(default=0)
+#     size = models.IntegerField(default=24)
+#     n_characters = models.IntegerField(default=0)
+#     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+#
+#     @classmethod
+#     def create(cls, player, names=None, images=None, size=24, game=None):
+#
+#         n_characters = 0 if names is None else len(names)
+#
+#         board = cls(player=player,
+#                     size=size,
+#                     n_characters=n_characters,
+#                     game=game)
+#         board.save()
+#
+#         if images is None and n_characters != 0:
+#             images = [None for _ in range(n_characters)]
+#
+#         for i in range(size):
+#             if i < n_characters:
+#                 Character.create(name=names[i],
+#                                  index=i,
+#                                  image=images[i],
+#                                  board=board)
+#             else:
+#                 Character.create(name="",
+#                                  index=i,
+#                                  image=None,
+#                                  board=board)
+#         return board
+#
+#     def get_character(self, index):
+#         return self.character_set.filter(index=index)[0]
+#
+#     def __str__(self):
+#         state = []
+#         for i in range(self.size):
+#             c = self.get_character(i)
+#             if c.name is "":
+#                 state.append('N')
+#             elif c.flipped:
+#                 state.append('T')
+#             else:
+#                 state.append('F')
+#         return str(state)
+
+
+# class Character(models.Model):
+#     name = models.TextField(default="")
+#     index = models.IntegerField(default=None)
+#     image = models.ImageField(default=None)
+#     flipped = models.BooleanField(default=True)
+#     board = models.ForeignKey(Board, on_delete=models.CASCADE)
+#
+#     @classmethod
+#     def create(cls, name=None, index=None, image=None, flipped=True, board=None):
+#         character = cls(name=name,
+#                         index=index,
+#                         image=image,
+#                         flipped=flipped,
+#                         board=board)
+#         character.save()
+#         return character
+#
+#     def flip(self):
+#         self.flipped = False if self.flipped else True
+#         self.save()
 
 
 # class Board(models.Model):

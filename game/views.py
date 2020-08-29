@@ -160,22 +160,22 @@ def game_guess(request, game_id):
 def join_game(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
-    json_dict = json_to_dict(request.body, ["user_id","content"])
+    print("join_game: Received join for game id %s" % (game_id))
 
-    print("join_game: Received join from %s for game id %s" % (json_dict["user_id"], game_id))
+    Game.set_ready() # i.e. there is more than one player now
 
-    return HttpResponse("Todo!")
+    return HttpResponse("Joined!")
 
 
 # Start game button is pressed, leave start menu screen
 def start_game(request, game_id):
-    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
-    json_dict = json_to_dict(request.body, ["num_players"])
+    if not check_game_id(game_id):
+        return HttpResponse("Invalid game ID!")
 
-    print("start_game: Received start game from %d with %d characters" % (game_id,json_dict["num_players"]))
+    json_dict = json_to_dict(request.body, ["num_characters"])
 
-    #TODO check someone else has joined
+    print("start_game: Received start game from %d with %d characters" % (game_id,json_dict["num_characters"]))
 
     return HttpResponse("Todo!")
 

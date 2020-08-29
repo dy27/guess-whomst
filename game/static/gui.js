@@ -315,21 +315,30 @@ function mouseFunction(event) {
         }
         if (start_button.onpress(event) == true) {
             
+            // Check more than one player has joined:
+            if (local_data["game_ready"] == 0) {
+                alert("There must be two players or more to play!");
+            } else {
 
-            var call_back = function() {
-                if(this.readyState == 4 && this.status == 200) {
-                    console.log("Sent message : " + this.responseText);
+                var call_back = function() {
+                    if(this.readyState == 4 && this.status == 200) {
+                        console.log("Sent message : " + this.responseText);
+                        if(this.responseText === "Joined!") {
+                            //TODO successful join
+                        }
+                    }
+                };
+
+                if(local_data["game_id"] != -1) { // If a game has been created i.e. an id has been assigned
+
+                    request_data = {"num_characters" : whomsts_no._value};
+
+                    post_request("game/"+local_data["game_id"]+"start/", call_back, "application/json", JSON.stringify(request_data));
+                    gameState = 1;
+                    drawGameBoard();
                 }
-            };
-
-            if(local_data["game_id"] != -1) { // If a game has been created i.e. an id has been assigned
-
-                request_data = {"num_players" : whomsts_no._value};
-
-                post_request("game/"+local_data["game_id"]+"start/", call_back, "application/json", JSON.stringify(request_data));
-                gameState = 1;
-                drawGameBoard();
             }
+
         }
 
     } else if (gameState == 1) {

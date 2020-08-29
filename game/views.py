@@ -101,7 +101,7 @@ def game_msg_get_all(request, game_id):
 
 
 def game_msg_get(request, game_id):
-    if not check_game_id(game_id) return HttpResponse("Invalid game ID!")
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["msg_id"])
     msg_id = json_dict["msg_id"]
@@ -119,7 +119,7 @@ def game_msg_get(request, game_id):
         return HttpResponse(msg_json, content_type="application/json")
 
 def game_poll(request, game_id):
-    if not check_game_id(game_id) return HttpResponse("Invalid game ID!")
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     game_data = game_data_from_id(game_id) #TODO un-mock
 
@@ -130,13 +130,13 @@ def game_poll(request, game_id):
 
 
 def game_guess(request, game_id):
-    if not check_game_id(game_id) return HttpResponse("Invalid game ID!")
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
     
     json_dict = json_to_dict(request.body, ["user_id","face_id"]) # face_id is their guess
     
     print("game_guess: Received guess from %s : face with id %d" % (json_dict["user_id"], json_dict["face_id"]))
 
-    if check_win(json_dict["face_id"], game_data):
+    if check_win(json_dict["face_id"], game_id):
         return HttpResponse("correct")
         #TODO Win state!
     else:
@@ -144,7 +144,7 @@ def game_guess(request, game_id):
         
 
 def join_game(request, game_id):
-    if not check_game_id(game_id) return HttpResponse("Invalid game ID!")
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["user_id","content"])
     
@@ -160,10 +160,10 @@ def create_game(request):
     return HttpResponse("Todo!")
 
 def join_team(request, game_id):
-    if not check_game_id(game_id) return HttpResponse("Invalid game ID!")
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
     json_dict = json_to_dict(request.body, ["user_id"])
     
-    print("join_game: Received join from %s for game id" % (json_dict["user_id"], game_id))
+    print("join_game: Received join from %s for game id %s" % (json_dict["user_id"], game_id))
 
     return HttpResponse("Todo!")

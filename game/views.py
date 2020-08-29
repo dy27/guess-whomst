@@ -1,3 +1,4 @@
+import random
 import json
 from django.shortcuts import render
 
@@ -5,7 +6,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
-from game.models import Game, Board, Character
+from game.models import Game, Character
 
 # def hello(request):
 #     return HttpResponse("Hello, world. You're at the polls index.")
@@ -78,7 +79,7 @@ def check_game_id(game_id):
 
 
 def game_json_from_id(game_id):
-    game = Game.find_game(game_id)
+    game = Game.get_game(game_id)
     return game.to_json()
 
 
@@ -137,7 +138,7 @@ def game_poll(request, game_id):
 
     game_json = game_json_from_id(game_id) #TODO un-mock
 
-    print("game_poll: Sending game data for game: %s" % (game_id))
+    #print("game_poll: Sending game data for game: %s" % (game_id))
 
     return HttpResponse(game_json, content_type="application/json")
 
@@ -166,12 +167,33 @@ def join_game(request, game_id):
     return HttpResponse("Todo!")
 
 
-def create_game(request):
-    json_dict = json_to_dict(request.body, ["user_id"])
+# Start game button is pressed, leave start menu screen
+def start_game(request, game_id):
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
-    print("join_game: Received create game from %s" % (json_dict["user_id"]))
+    json_dict = json_to_dict(request.body, ["num_players"])
+
+    print("start_game: Received start game from %d with %d characters" % (game_id,json_dict["num_players"]))
+
+    #TODO check someone else has joined
 
     return HttpResponse("Todo!")
+
+
+def create_game(request):
+
+    print("create_game: Received create game. Creating database entry...")
+    rnd_id = random.randint(0,10000)
+
+    while check_game_id(rnd_id):
+        rnd_id = random.randint(0,10000)
+
+    game_object = Game.create(rnd_id)
+
+    return HttpResponse(game_object.to_json(), content_type="application/json")
+
+
+
 
 def join_team(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
@@ -182,12 +204,7 @@ def join_team(request, game_id):
 
     return HttpResponse("Todo!")
 
-# Start game button is pressed, leave start menu screen
-def start_game(request):
 
-    print("join_game: Received start game")
-
-    return HttpResponse("Todo!")
 
 # End the turn for player who asked the current question and has finished flipping tiles
 def end_question_turn(request):
@@ -212,3 +229,14 @@ def end_answer_turn(request):
     print("join_game: Received end answer turn from %s" % (json_dict["user_id"]))
 
     return HttpResponse("Todo!")
+
+
+
+
+
+
+def send_img(request, game_id):
+    pass
+
+def send_img_metadata(request, game_id):
+    pass

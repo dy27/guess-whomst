@@ -55,3 +55,41 @@ def is_valid_game_id(id):
 # # Main game view
 # def game(request):
 #     return render(request, "game.html", {})
+
+
+
+
+
+### AJAX views
+
+def game_msg_send(request):
+    response = ""
+    username = request.POST.get('username', None)
+    render
+    return response
+
+
+def game_msg_get_all(request):
+    response = ""
+    return response
+
+
+def game_msg_get(request):
+    response = ""
+    return response
+
+def game(request):
+    response = ""
+    return response
+
+def game_guess(request):
+    response = ""
+    return response
+
+def join_game(request):
+    response = ""
+    return response
+
+def create_game(request):
+    response = ""
+    return response

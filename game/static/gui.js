@@ -314,8 +314,7 @@ function mouseFunction(event) {
 
         }
         if (start_button.onpress(event) == true) {
-            gameState = 1;
-            drawGameBoard();
+            
 
             var call_back = function() {
                 if(this.readyState == 4 && this.status == 200) {
@@ -323,8 +322,14 @@ function mouseFunction(event) {
                 }
             };
 
-            request = {"user_id":user_id, "content" : question_box._value}
-            post_request("start", call_back, "application/json", "");
+            if(local_data["game_id"] != -1) { // If a game has been created i.e. an id has been assigned
+
+                request_data = {"num_players" : whomsts_no._value};
+
+                post_request("game/"+local_data["game_id"]+"start/", call_back, "application/json", JSON.stringify(request_data));
+                gameState = 1;
+                drawGameBoard();
+            }
         }
 
     } else if (gameState == 1) {
@@ -335,7 +340,7 @@ function mouseFunction(event) {
         }
         for (var o = 0; o < 3; o++) {
             if (action_buttons[o].onpress(event) == true) {
-                if (o == 1){
+                if (o == 1){ // reset
                     reset_tiles();
                     draw_whomsts();
                     setTimeout(function(){
@@ -344,7 +349,7 @@ function mouseFunction(event) {
                         action_buttons[1].draw();
                     },100);
 
-                } else if (o == 2){
+                } else if (o == 2){  // quit
                     gameState = 0;
                     start_button.colour = "Azure";
                     reset_tiles();

@@ -7,6 +7,7 @@ class Game(models.Model):
     game_id = models.IntegerField(default=0)
     turn = models.IntegerField(default=0)
     size = models.IntegerField(default=0)
+    game_ready = models.IntegerField(default=0)
 
     @classmethod
     def create(cls, game_id, names, images=None):
@@ -46,6 +47,10 @@ class Game(models.Model):
 
     def get_character(self, index):
         return self.character_set.filter(index=index)[0]
+
+    def set_ready(self):
+        self.game_ready = 1
+        self.save()
 
     @classmethod
     def get_game(cls, game_id):

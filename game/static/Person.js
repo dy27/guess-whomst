@@ -24,7 +24,12 @@ class Person extends Interactive {
             ctx.fill();
             ctx.closePath();
 
-            
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(this.name, this.x + this.width/2, this.y + this.height/2 + 80);
+            ctx.textAlign = "start";
+
         }
     }
 

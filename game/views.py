@@ -230,7 +230,15 @@ def end_answer_turn(request):
 
     return HttpResponse("Todo!")
 
+# Join game button is pressed, allow second player to joing the game
+def join_game(request, game_id):
+    if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
+    json_dict = json_to_dict(request.body, ["num_players"])
+
+    print("join_game: Received join game from %d with %d characters" % (game_id,json_dict["num_players"]))
+
+    return HttpResponse("Todo!")
 
 
 

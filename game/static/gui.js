@@ -63,7 +63,8 @@ var pict_objects = new Array();
 var options = new Array();
 var action_buttons = new Array();
 var reset_button = new Button(145, 40, 855, 320, ctx, "Reset");
-var start_button = new Button(337, 45, 670, 630, ctx, "Start Button");
+var start_button = new Button(337, 45, 670, 630, ctx, "Start Game");
+var join_button = new Button(100, 45, 890, 410, ctx, "Join Game");
 var whomsts_no;
 var question_box;
 var chatMsg;
@@ -109,7 +110,10 @@ function create_name_texts(){
                         innerShadow: "1px 1px 0px rgba(0,0,0,0)",
                         borderRadius: 3,
                         onsubmit: function (){
+                            //alert('hi');
+                            //alert(nameTagsEntries[6*r+c]._value);
                             pict_objects[6 * r + c].name = nameTagsEntries[6*r+c]._value;
+                            //alert("Value: " + nameTagsEntries[6*r+c]._value + " Name: " + pict_objects[6 * r + c].name);
                         }
 
                     });
@@ -212,8 +216,9 @@ function drawStartBoard() {
     ctx.fillStyle = "CornflowerBlue";
     ctx.fillText("Players:", x_elements + 10, 430);
 
-    // Start button
+    // Start and join button
     start_button.draw();
+    join_button.draw();
 }
 
 
@@ -356,8 +361,7 @@ function mouseFunction(event) {
 
         if (reset_button.onpress(event) == true) {
 
-        }
-        if (start_button.onpress(event) == true) {
+        } else if (start_button.onpress(event) == true) {
             gameState = 1;
             drawGameBoard();
 
@@ -372,8 +376,24 @@ function mouseFunction(event) {
                 request_data = {"num_players" : whomsts_no._value};
 
                 post_request("game/"+local_data["game_id"]+"start/", call_back, "application/json", JSON.stringify(request_data));
+
                 gameState = 1;
                 drawGameBoard();
+            }
+            
+        } else if (join_button.onpress(event) == true) {
+            var call_back = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log("Sent message : " + this.responseText);
+                }
+            };
+
+            if(local_data["game_id"] != -1) { // If a game has been created i.e. an id has been assigned
+
+                request_data = {"num_players" : whomsts_no._value};
+
+                post_request("game/"+local_data["game_id"]+"join/", call_back, "application/json", JSON.stringify(request_data));
+
             }
         }
 

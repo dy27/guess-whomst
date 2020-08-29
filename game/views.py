@@ -176,3 +176,7 @@ def join_team(request, game_id):
     print("join_game: Received join from %s for game id %s" % (json_dict["user_id"], game_id))
 
     return HttpResponse("Todo!")
+
+
+
+

@@ -27,32 +27,31 @@ ctx.strokeStyle = "CornflowerBlue";
 ctx.stroke();
 ctx.closePath();
 
+
 // Create person objects
 var pict_objects = new Array();
 for (var r = 0; r < 6; r++) {
     for (var c = 0; c < 4; c++) {
-        pict_objects[4*r + c] = new Person("random", r * 100, c * 180, "AliceBlue", "None");
+        pict_objects[4*r + c] = new Person("random", r * 100, c * 180, "AliceBlue", "None", ctx);
     }
 }
+
+function mouseFunction(event) {
+    for (var p = 0; p < 24; p++) {
+        if (pict_objects[p].onpress(event) == true) {
+            break;
+        }
+    }
+}
+
+// Detect mouse press
+canvas.addEventListener("click", mouseFunction, false);
+
 
 // Draw the person objects (pictures + nametags)
 for (var r = 0; r < 6; r++) {
 
     for (var c = 0; c < 4; c++) {
-        ctx.beginPath();
-        ctx.roundedRectangle(pict_objects[4*r+c].x + 30, pict_objects[4*r+c].y + 15,
-            pict_objects[4*r+c].pict_width, pict_objects[4*r+c].pict_height, 10);
-        ctx.stroke();
-        ctx.fillStyle = pict_objects[4*r+c].colour;
-        ctx.fill();
-        ctx.closePath();
-
-        ctx.beginPath();
-        ctx.roundedRectangle(pict_objects[4*r+c].x + 30, pict_objects[4*r+c].y + 35 + pict_objects[4*r+c].pict_height
-            , pict_objects[4*r+c].name_width, pict_objects[4*r+c].name_height, 6);
-        ctx.stroke();
-        ctx.fillStyle = pict_objects[4*r+c].colour;
-        ctx.fill();
-        ctx.closePath();
+        pict_objects[4*r+c].draw();
     }
 }

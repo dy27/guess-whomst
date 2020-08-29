@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     
-    
     path(r'^game/$/msg/send', views.game_msg_send, name='game_msg_send'),
     path(r'^game/$/msg/get_all', views.game_msg_get_all, name='game_msg_get_all'),
     path(r'^game/$/msg/get', views.game_msg_get, name='game_msg_get'),

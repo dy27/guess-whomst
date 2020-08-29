@@ -55,8 +55,14 @@ def is_valid_game_id(id):
 # def game(request):
 #     return render(request, "game.html", {})
 
-### AJAX views
 
+
+
+################## Random helper functions
+
+
+
+### json_to_dict for responses
 def json_to_dict(json_str, expected_fields=[]):
     json_dict = json.loads(json_str)
     for field in expected_fields:
@@ -68,15 +74,19 @@ def check_game_id(game_id):
     #TODO check if game_id is in database
     return True
 
-def game_data_from_id(game_id):
+def game_json_from_id(game_id):
     #TODO return the database object modle thingy
     return {}
 
 def check_win(face_id_guessed, game_id):
-    game_data = game_data_from_id(game_id) #TODO un-mock
+    game_json = game_json_from_id(game_id) #TODO un-mock
 
     #TODO
     return False
+
+
+
+################## AJAX views
 
 def game_msg_send(request, game_id):
 
@@ -121,10 +131,9 @@ def game_msg_get(request, game_id):
 def game_poll(request, game_id):
     if not check_game_id(game_id): return HttpResponse("Invalid game ID!")
 
-    game_data = game_data_from_id(game_id) #TODO un-mock
+    game_json = game_json_from_id(game_id) #TODO un-mock
 
     print("game_poll: Sending game data for game: %s" % (game_id))
-    game_json = json.dumps(game_data)
     
     return HttpResponse(game_json, content_type="application/json")
 

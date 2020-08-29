@@ -20,4 +20,9 @@ urlpatterns = [
 
     path(r'game/<int:game_id>/send_img/', views.send_img, name='join_team'),
     path(r'game/<int:game_id>/send_img_metadata/', views.send_img_metadata, name='join_team')
+
+    path(r'start', views.start_game, name='start_game'),
+    path(r'game/<int:game_id>/endQuestionTurn', views.end_question_turn, name='end_question_turn'),
+    path(r'game/<int:game_id>/quit', views.quit_game, name='quit_game'),
+    path(r'game/<int:game_id>/endAnswerTurn', views.end_answer_turn, name='end_answer_turn')
 ]

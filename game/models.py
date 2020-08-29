@@ -1,4 +1,9 @@
 from django.db import models
+# import math
+
+
+
+# Create your models here.
 from django.forms.models import model_to_dict
 import json
 

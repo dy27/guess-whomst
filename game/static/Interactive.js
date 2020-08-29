@@ -21,7 +21,7 @@ class Interactive extends Element {
     }
 
     action () {
-
+        
     }
 
 }

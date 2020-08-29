@@ -23,17 +23,19 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/guesswho" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/game/static" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Roast\PycharmProjects\guess-whomst\game\static" />
+      <recent name="C:\Users\Roast\PycharmProjects\guesswho\guesswho" />
+      <recent name="C:\Users\Roast\PycharmProjects\guesswho" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Roast\PycharmProjects\guess-whomst\game\templates" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game\static" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game\templates" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Roast\PycharmProjects\guesswho\guesswho" />
-      <recent name="C:\Users\Roast\PycharmProjects\guesswho" />
     </key>
   </component>
   <component name="ServiceViewManager">

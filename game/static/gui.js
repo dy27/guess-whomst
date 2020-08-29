@@ -1,6 +1,3 @@
-// Function to draw a rounded rectangle
-user_id = 0; //TODO
-
 
 /// Reference
 CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, height, roundedness) {
@@ -292,21 +289,3 @@ function mouseFunction(event) {
         }
     }
 }
-
-
-document.body.onkeyup = function(event){
-
-    var k = event.key || event.keyCode;
-
-    if(k === "Enter") {
-        var httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function() {
-            if(this.readyState == 4 && this.status == 200) {
-                console.log("Sent message : " + this.responseText);
-            }
-        };
-
-        httpRequest.open("POST", "game/" + user_id + "/msg/send", true);
-        httpRequest.send("user_id=" + user_id+"&content=" + question_box._value);
-    }
-};

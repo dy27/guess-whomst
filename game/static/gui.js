@@ -129,7 +129,6 @@ function mouseFunction(event) {
 document.body.onkeyup = function(event){
 
     var k = event.key || event.keyCode;
-
     if(k === "Enter") {
         var httpRequest = new XMLHttpRequest();
         httpRequest.onreadystatechange = function() {

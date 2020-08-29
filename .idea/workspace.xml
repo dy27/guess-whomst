@@ -23,17 +23,19 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/guesswho" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/game/static" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Roast\PycharmProjects\guess-whomst\game\static" />
+      <recent name="C:\Users\Roast\PycharmProjects\guesswho\guesswho" />
+      <recent name="C:\Users\Roast\PycharmProjects\guesswho" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Roast\PycharmProjects\guess-whomst\game\templates" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game\static" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game\templates" />
       <recent name="C:\Users\Roast\PycharmProjects\guesswho\game" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Roast\PycharmProjects\guesswho\guesswho" />
-      <recent name="C:\Users\Roast\PycharmProjects\guesswho" />
     </key>
   </component>
   <component name="ServiceViewManager">
@@ -66,6 +68,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598699979388">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1598699979388" />
     <state x="740" y="276" key="FileChooserDialogImpl" timestamp="1598683617209">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

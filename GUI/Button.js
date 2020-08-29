@@ -1,11 +1,11 @@
 class Button extends Interactive {
-    constructor(x, y, ctx, text) {
-        super(84, 45, x, y, "Azure", ctx);
+    constructor(width, height, x, y, ctx, text) {
+        super(width, height, x, y, "Azure", ctx);
         this.text = text;
     }
 
-    draw() {
 
+    draw() {
         ctx.beginPath();
         ctx.roundedRectangle(this.x, this.y, this.width, this.height, 10);
         ctx.stroke();
@@ -16,7 +16,8 @@ class Button extends Interactive {
         ctx.font = "18px Arial";
         ctx.fillStyle = "black";
         ctx.textAlign = "center";
-        ctx.fillText(this.text, this.x + 42, this.y + 30);
+        ctx.fillText(this.text, this.x + this.width/2, this.y + this.height/2 + 5);
+        ctx.textAlign = "start";
     }
 
     action () {

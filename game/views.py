@@ -17,16 +17,6 @@ from django.http import HttpResponse
 def index(request):
     return render(request, "game.html", {})
 
-
-# def index(request):
-#     b = Board(['name'], None)
-#     b.save()
-#     b1 = Board.objects.all()
-#     # g = Game(5)
-#     # g1 = Game.objects.get(id=5)
-#     print(b1)
-#     return HttpResponse(str(b1))
-
 # def index(request):
 #     b = Board(['name'], None)
 #     b.save()

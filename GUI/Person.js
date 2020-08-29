@@ -26,15 +26,15 @@ class Person extends Interactive {
 
     action () {
 
-        if (gameState == 1) {
-            if (this.active == true) {
-                this.colour = "CornflowerBlue";
-                this.active = false;
-            } else {
-                this.colour = "AliceBlue";
-                this.active = true;
-            }
-            this.draw();
+
+        if (this.active == true) {
+            this.colour = "CornflowerBlue";
+            this.active = false;
+        } else {
+            this.colour = "AliceBlue";
+            this.active = true;
         }
+        this.draw();
+
     }
 }

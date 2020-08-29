@@ -1,6 +1,6 @@
 class Person extends Interactive {
     constructor(p_name, x, y, colour, img, ctx) {
-        super(64, 95, x + 30, y + 20, colour, ctx);
+        super(64, 95, x + 30, y + 80, colour, ctx);
         this.name = p_name;
         this.name_width = 64;
         this.name_height = 19;
@@ -25,6 +25,8 @@ class Person extends Interactive {
     }
 
     action () {
+
+
         if (this.active == true) {
             this.colour = "CornflowerBlue";
             this.active = false;
@@ -33,5 +35,6 @@ class Person extends Interactive {
             this.active = true;
         }
         this.draw();
+
     }
 }

@@ -1,7 +1,7 @@
 from django.db import models
 # import math
 
-from django.contrib.postgres.fields import ArrayField
+
 
 # Create your models here.
 from django.forms.models import model_to_dict
@@ -54,6 +54,10 @@ class Game(models.Model):
         dict_obj['board1']['characters'] = c1
 
         return json.dumps(dict_obj)
+
+    @classmethod
+    def get_game(cls, game_id):
+        return cls.objects.filter(game_id=game_id)[0]
 
     @classmethod
     def delete_all(cls):

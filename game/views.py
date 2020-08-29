@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 
+from game.models import Game, Board, Character
 
 # def hello(request):
 #     return HttpResponse("Hello, world. You're at the polls index.")
@@ -61,7 +62,6 @@ def is_valid_game_id(id):
 ################## Random helper functions
 
 
-
 ### json_to_dict for responses
 def json_to_dict(json_str, expected_fields=[]):
     json_dict = json.loads(json_str)
@@ -70,13 +70,17 @@ def json_to_dict(json_str, expected_fields=[]):
 
     return json_dict
 
+
 def check_game_id(game_id):
     #TODO check if game_id is in database
-    return True
+    query = Game.objects.filter(game_id=game_id)
+    return True if len(query) != 0 else False
+
 
 def game_json_from_id(game_id):
-    #TODO return the database object modle thingy
-    return {}
+    game = Game.find_game(game_id)
+    return game.to_json()
+
 
 def check_win(face_id_guessed, game_id):
     game_json = game_json_from_id(game_id) #TODO un-mock

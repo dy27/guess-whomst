@@ -1,7 +1,7 @@
 from django.db import models
 # import math
 
-from django.contrib.postgres.fields import ArrayField
+
 
 # Create your models here.
 from django.forms.models import model_to_dict

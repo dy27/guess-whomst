@@ -541,6 +541,7 @@ function mouseFunction(event) {
 
             start_button.colour = "Azure";
             reset_tiles();
+            reset_imgs();
             drawStartBoard();
 
             var call_back = function() {

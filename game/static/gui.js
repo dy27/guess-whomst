@@ -20,6 +20,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, heig
 
 var gameState = 0; // 0 = start menu, 1 = asking question, 2 = answering question
 var played = 0;
+var globalIndex = 0;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -35,9 +36,15 @@ ctx.stroke();
 ctx.closePath();
 
 /*
+
+<img id="michelle" src="../static/Michelle.png">
+<img id="ellen" src="../static/Ellen.png">
+
+
 <label>Image File:</label><br/>
 <input type="file" id="imageLoader" name="imageLoader"/>
 
+*/
 
 var imageLoader = document.getElementById('imageLoader');
 imageLoader.addEventListener('change', handleImage, false);
@@ -47,13 +54,15 @@ function handleImage(e){
     reader.onload = function(event){
         var img = new Image();
         img.onload = function(){
-            ctx.drawImage(img, 30, 20, 64, 95);
+            ctx.drawImage(img, pict_objects[globalIndex].x, pict_objects[globalIndex].y, 64, 95);
+            pict_objects[globalIndex].pict_img = img;
         }
         img.src = event.target.result;
     }
     reader.readAsDataURL(e.target.files[0]);
 }
-*/
+
+
 
 // Detect mouse press
 canvas.addEventListener("click", mouseFunction, false);
@@ -69,10 +78,13 @@ var whomsts_no;
 var question_box;
 var chatMsg;
 
+var default_names = new Array("Michelle", "Trump", "Ronaldo", "Hitler", "Barack",
+    "Jesus", "RDJ", "Einstein", "Gates", "Bezos", "Zucc", "Federer", "SpgBob", "K. Perry",
+    "Ellen", "Queen", "Ardern", "MLK", "Jong un", "Oprah", "Beyonce", "J. Chan", "Musk", "B. Lee");
 var numFaces = 24;
 for (var r = 0; r < 4; r++) {
     for (var c = 0; c < 6; c++) {
-        pict_objects[6 * r + c] = new Person("random", c*100, r*160, "AliceBlue", "None", ctx);
+        pict_objects[6 * r + c] = new Person(default_names[6*r + c], c*100, r*160, "AliceBlue", 0, ctx);
     }
 }
 
@@ -95,29 +107,21 @@ function create_name_texts(){
         for (var c = 0; c < 6; c++) {
             if (6 * r + c < numFaces) {
 
-                //if (gameState == 0) {
-                    nameTagsEntries[6*r+c] = new CanvasInput({
-                        canvas: document.getElementById('canvas'),
-                        fontSize: 12,
-                        x: c*100 + 27,
-                        y: r*160+20+170,
-                        width: 54,
-                        height: 12,
-                        backgroundColor: "Azure",
-                        borderColor: "CornflowerBlue",
-                        placeHolder: 'Name...',
-                        placeHolderColor: "gray",
-                        innerShadow: "1px 1px 0px rgba(0,0,0,0)",
-                        borderRadius: 3,
-                        onsubmit: function (){
-                            //alert('hi');
-                            //alert(nameTagsEntries[6*r+c]._value);
-                            pict_objects[6 * r + c].name = nameTagsEntries[6*r+c]._value;
-                            //alert("Value: " + nameTagsEntries[6*r+c]._value + " Name: " + pict_objects[6 * r + c].name);
-                        }
+                nameTagsEntries[6*r+c] = new CanvasInput({
+                    canvas: document.getElementById('canvas'),
+                    fontSize: 12,
+                    x: c*100 + 27,
+                    y: r*160+20+170,
+                    width: 54,
+                    height: 12,
+                    backgroundColor: "Azure",
+                    borderColor: "CornflowerBlue",
+                    placeHolder: default_names[6*r+c],
+                    placeHolderColor: "gray",
+                    innerShadow: "1px 1px 0px rgba(0,0,0,0)",
+                    borderRadius: 3
+                });
 
-                    });
-                //}
             } else {
                 nameTagsEntries[6*r+c].destroy();
             }
@@ -130,7 +134,6 @@ if (gameState == 0) {
 } else if (gameState > 0) {
     drawGameBoard();
 }
-
 
 function drawStartBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -157,6 +160,11 @@ function drawStartBoard() {
 
     // Draw the person objects (pictures + nametags)
     draw_whomsts();
+
+    //var michelle = document.getElementById("michelle");
+    //var ellen = document.getElementById("ellen");
+    //ctx.drawImage(michelle, 100, 200);
+    //ctx.drawImage(ellen, 500, 500);
 
     var x_elements = 670;
 
@@ -244,6 +252,15 @@ function drawGameBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white"; // Background colour
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Store the names from name entries to each object
+    for (var i = 0; i < numFaces; i++) {
+        if (nameTagsEntries[i]._value === "Name...") {
+            pict_objects[i].name = default_names[i];
+        } else {
+            pict_objects[i].name = nameTagsEntries[i]._value;
+        }
+    }
 
     whomsts_no.destroy();
     for (var i = 0; i < numFaces; i++) {
@@ -354,12 +371,41 @@ function reset_tiles(){
     }
 }
 
+function reset_imgs() {
+    for (var r = 0; r < numFaces; r++) {
+        pict_objects[r].pict_img = 0;
+    }
+    draw_whomsts();
+}
+
 // Function to detect and act on mouse clicks
 function mouseFunction(event) {
 
     if (gameState == 0) {
 
+        for (var p = 0; p < numFaces; p++) {
+            if (pict_objects[p].onpress(event) == true) {
+                globalIndex = p;
+                setTimeout(function(){
+                    pict_objects[p].colour = "AliceBlue";
+                    pict_objects[p].active = true;
+                    pict_objects[p].draw();
+                },100);
+                break;
+            }
+        }
+
         if (reset_button.onpress(event) == true) {
+            reset_imgs();
+            for (var i = 0; i < numFaces; i++) {
+                nameTagsEntries[i].destroy();
+            }
+            create_name_texts();
+            setTimeout(function(){
+                reset_button.colour = "Azure";
+                reset_button.active = true;
+                reset_button.draw();
+            },100);
 
         } else if (start_button.onpress(event) == true) {
             gameState = 1;
@@ -380,7 +426,7 @@ function mouseFunction(event) {
                 gameState = 1;
                 drawGameBoard();
             }
-            
+
         } else if (join_button.onpress(event) == true) {
             var call_back = function() {
                 if(this.readyState == 4 && this.status == 200) {
@@ -420,6 +466,7 @@ function mouseFunction(event) {
                     numFaces = 24;
                     start_button.colour = "Azure";
                     reset_tiles();
+                    reset_imgs();
                     drawStartBoard();
 
                     var call_back = function() {

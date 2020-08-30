@@ -16,6 +16,10 @@ class Person extends Interactive {
         ctx.fill();
         ctx.closePath();
 
+        if (this.pict_img != 0) {
+            ctx.drawImage(this.pict_img, this.x, this.y, 64, 95);
+        }
+
         if (gameState == 1 || gameState == 2) {
             ctx.beginPath();
             ctx.roundedRectangle(this.x, this.y + 20 + this.height, this.name_width, this.name_height, 6);
@@ -34,7 +38,6 @@ class Person extends Interactive {
     }
 
     action () {
-
 
         if (this.active == true) {
             this.colour = "CornflowerBlue";

@@ -1,8 +1,6 @@
 // Function to draw a rounded rectangle
 user_id = 0; //TODO
 
-
-
 /// Reference
 CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, height, roundedness) {
   const radiansInCircle = 2 * Math.PI;
@@ -22,6 +20,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function(x, y, width, heig
 
 var gameState = 0; // 0 = start menu, 1 = asking question, 2 = answering question
 var played = 0;
+var globalIndex = 0;
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -37,9 +36,15 @@ ctx.stroke();
 ctx.closePath();
 
 /*
+
+<img id="michelle" src="../static/Michelle.png">
+<img id="ellen" src="../static/Ellen.png">
+
+
 <label>Image File:</label><br/>
 <input type="file" id="imageLoader" name="imageLoader"/>
 
+*/
 
 var imageLoader = document.getElementById('imageLoader');
 imageLoader.addEventListener('change', handleImage, false);
@@ -49,13 +54,15 @@ function handleImage(e){
     reader.onload = function(event){
         var img = new Image();
         img.onload = function(){
-            ctx.drawImage(img, 30, 20, 64, 95);
+            ctx.drawImage(img, pict_objects[globalIndex].x, pict_objects[globalIndex].y, 64, 95);
+            pict_objects[globalIndex].pict_img = img;
         }
         img.src = event.target.result;
     }
     reader.readAsDataURL(e.target.files[0]);
 }
-*/
+
+
 
 // Detect mouse press
 canvas.addEventListener("click", mouseFunction, false);
@@ -65,30 +72,68 @@ var pict_objects = new Array();
 var options = new Array();
 var action_buttons = new Array();
 var reset_button = new Button(145, 40, 855, 320, ctx, "Reset");
-var start_button = new Button(337, 45, 670, 630, ctx, "Start Button");
+var start_button = new Button(337, 45, 670, 630, ctx, "Start Game");
+var join_button = new Button(100, 45, 890, 410, ctx, "Join Game");
 var whomsts_no;
 var question_box;
 var chatMsg;
 
+var default_names = new Array("Michelle", "Trump", "Ronaldo", "Hitler", "Barack",
+    "Jesus", "RDJ", "Einstein", "Gates", "Bezos", "Zucc", "Federer", "SpgBob", "K. Perry",
+    "Ellen", "Queen", "Ardern", "MLK", "Jong un", "Oprah", "Beyonce", "J. Chan", "Musk", "B. Lee");
 var numFaces = 24;
 for (var r = 0; r < 4; r++) {
     for (var c = 0; c < 6; c++) {
-        pict_objects[6 * r + c] = new Person("random", c*100, r*160, "AliceBlue", "None", ctx);
+        pict_objects[6 * r + c] = new Person(default_names[6*r + c], c*100, r*160, "AliceBlue", 0, ctx);
     }
 }
+
+var nameTagsEntries = new Array();
 
 function draw_whomsts(){
-    for (var r = 0; r < numFaces; r++) {
-        pict_objects[r].draw();
+    for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 6; c++) {
+            if (6 * r + c < numFaces) {
+                pict_objects[6 * r + c].draw();
+            }
+        }
     }
 }
 
+
+function create_name_texts(){
+
+    for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 6; c++) {
+            if (6 * r + c < numFaces) {
+
+                nameTagsEntries[6*r+c] = new CanvasInput({
+                    canvas: document.getElementById('canvas'),
+                    fontSize: 12,
+                    x: c*100 + 27,
+                    y: r*160+20+170,
+                    width: 54,
+                    height: 12,
+                    backgroundColor: "Azure",
+                    borderColor: "CornflowerBlue",
+                    placeHolder: default_names[6*r+c],
+                    placeHolderColor: "gray",
+                    innerShadow: "1px 1px 0px rgba(0,0,0,0)",
+                    borderRadius: 3
+                });
+
+            } else {
+                nameTagsEntries[6*r+c].destroy();
+            }
+
+        }
+    }
+}
 if (gameState == 0) {
     drawStartBoard();
-} else if (gameState == 1) {
+} else if (gameState > 0) {
     drawGameBoard();
 }
-
 
 function drawStartBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -99,6 +144,7 @@ function drawStartBoard() {
         question_box.destroy();
         chatMsg.destroy();
     }
+    create_name_texts();
     // Vertical line
     ctx.beginPath();
     ctx.moveTo(644, 0);
@@ -113,9 +159,12 @@ function drawStartBoard() {
     ctx.fillText("Guess Whomst?!", 155, 40);
 
     // Draw the person objects (pictures + nametags)
-    for (var r = 0; r < numFaces; r++) {
-        pict_objects[r].draw();
-    }
+    draw_whomsts();
+
+    //var michelle = document.getElementById("michelle");
+    //var ellen = document.getElementById("ellen");
+    //ctx.drawImage(michelle, 100, 200);
+    //ctx.drawImage(ellen, 500, 500);
 
     var x_elements = 670;
 
@@ -152,8 +201,12 @@ function drawStartBoard() {
                 ctx.font = "40px Arial";
                 ctx.fillStyle = "CornflowerBlue";
                 ctx.fillText("Guess Whomst?!", 155, 40);
+                for (var i = 0; i < numFaces; i++) {
+                    nameTagsEntries[i].destroy();
+                }
                 numFaces = whomsts_no._value;
                 draw_whomsts();
+                create_name_texts();
             }
         }
 
@@ -171,11 +224,10 @@ function drawStartBoard() {
     ctx.fillStyle = "CornflowerBlue";
     ctx.fillText("Players:", x_elements + 10, 430);
 
-    // Start button
+    // Start and join button
     start_button.draw();
+    join_button.draw();
 }
-
-
 
 
 function drawString(ctx, text, posX, posY, textColor, rotation, font, fontSize) {
@@ -200,7 +252,20 @@ function drawGameBoard() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white"; // Background colour
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Store the names from name entries to each object
+    for (var i = 0; i < numFaces; i++) {
+        if (nameTagsEntries[i]._value === "Name...") {
+            pict_objects[i].name = default_names[i];
+        } else {
+            pict_objects[i].name = nameTagsEntries[i]._value;
+        }
+    }
+
     whomsts_no.destroy();
+    for (var i = 0; i < numFaces; i++) {
+        nameTagsEntries[i].destroy();
+    }
     played = 1;
 
     // Vertical line
@@ -306,12 +371,28 @@ function reset_tiles(){
     }
 }
 
+function reset_imgs() {
+    for (var r = 0; r < numFaces; r++) {
+        pict_objects[r].pict_img = 0;
+    }
+    draw_whomsts();
+}
+
 // Function to detect and act on mouse clicks
 function mouseFunction(event) {
 
     if (gameState == 0) {
-        if (reset_button.onpress(event) == true) {
 
+        for (var p = 0; p < numFaces; p++) {
+            if (pict_objects[p].onpress(event) == true) {
+                globalIndex = p;
+                setTimeout(function(){
+                    pict_objects[p].colour = "AliceBlue";
+                    pict_objects[p].active = true;
+                    pict_objects[p].draw();
+                },100);
+                break;
+            }
         }
         /*
         if (join_button.onpress(event) == true) {
@@ -319,7 +400,21 @@ function mouseFunction(event) {
             player_number = 1;
         }
         */
-        if (start_button.onpress(event) == true) {
+        //if (start_button.onpress(event) == true) {
+
+        if (reset_button.onpress(event) == true) {
+            reset_imgs();
+            for (var i = 0; i < numFaces; i++) {
+                nameTagsEntries[i].destroy();
+            }
+            create_name_texts();
+            setTimeout(function(){
+                reset_button.colour = "Azure";
+                reset_button.active = true;
+                reset_button.draw();
+            },100);
+
+        } else if (start_button.onpress(event) == true) {
 
             // Request to create the game:
             var call_back = function() {
@@ -341,11 +436,21 @@ function mouseFunction(event) {
             post_request("game/start", call_back, "application/json", JSON.stringify(request_data));
             gameState = 1;
             drawGameBoard();
-            
+  
+        } else if (join_button.onpress(event) == true) {
+            var call_back = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log("Sent message : " + this.responseText);
+                }
+            };
+
+            join_game_id = prompt("Enter game id:")
+            post_request("game/"+join_game_id+"join/", call_back, "application/json", JSON.stringify(request_data));
+
         }
 
     } else if (gameState == 1) {
-        for (var p = 0; p < 24; p++) {
+        for (var p = 0; p < numFaces; p++) {
             if (pict_objects[p].onpress(event) == true) {
                 break;
             }
@@ -363,8 +468,11 @@ function mouseFunction(event) {
 
                 } else if (o == 2){  // quit
                     gameState = 0;
+
+                    numFaces = 24;
                     start_button.colour = "Azure";
                     reset_tiles();
+                    reset_imgs();
                     drawStartBoard();
 
                     var call_back = function() {
@@ -434,8 +542,12 @@ function mouseFunction(event) {
 
         } else if (action_buttons[2].onpress(event) == true){
             gameState = 0;
+
+            numFaces = 24;
+
             start_button.colour = "Azure";
             reset_tiles();
+            reset_imgs();
             drawStartBoard();
 
             var call_back = function() {

@@ -16,16 +16,28 @@ class Person extends Interactive {
         ctx.fill();
         ctx.closePath();
 
-        ctx.beginPath();
-        ctx.roundedRectangle(this.x, this.y + 20 + this.height, this.name_width, this.name_height, 6);
-        ctx.stroke();
-        ctx.fillStyle = this.colour;
-        ctx.fill();
-        ctx.closePath();
+        if (this.pict_img != 0) {
+            ctx.drawImage(this.pict_img, this.x, this.y, 64, 95);
+        }
+
+        if (gameState == 1 || gameState == 2) {
+            ctx.beginPath();
+            ctx.roundedRectangle(this.x, this.y + 20 + this.height, this.name_width, this.name_height, 6);
+            ctx.stroke();
+            ctx.fillStyle = this.colour;
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.fillText(this.name, this.x + this.width/2, this.y + this.height/2 + 80);
+            ctx.textAlign = "start";
+
+        }
     }
 
     action () {
-
 
         if (this.active == true) {
             this.colour = "CornflowerBlue";

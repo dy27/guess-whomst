@@ -36,9 +36,9 @@ document.body.onkeyup = function(event){
             local_data["turn"] = parseInt(local_data["turn"] + 1) % 2;
         }
 
-    } else {
+    } /* else {
         alert("Please wait for the other player/s to join the game! The game id is " + local_data["game_id"])
-    }
+    } */
 };
 
 

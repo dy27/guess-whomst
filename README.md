@@ -1,18 +1,7 @@
 # guess-whomst
 
-## Inspiration
+## Overview
+Guess Whomst? is an implementation of Guess Who in an online environment with fully customisable character cards which can be specified and uploaded by the users. The application is hosted on a web app and is capable of hosting different game sessions for different users simultaneously. This project was inspired by the high demand for online board game alternatives as a result of COVID-19.
 
-Our project was inspired by the high demand for online board game alternatives as a result of COVID-19.
-What it does
-
-Guess Whomst? is an implementation of Guess Who in an online environment with fully customisable character cards which can be specified and uploaded by the users. The application is hosted on a web app and is capable of hosting different game sessions for different users simultaneously.
-
-## Tools
-
-* Django
-* HTML5 canvas
-
-## What's next?
-
-* A full implementation of the server,
-* Integration with a video calling app such as *Zoom*
+## Implementation
+The application back-end is built in Python using the Django web framework, and linked to an SQLite database for storage of active game sessions. The front-end is built in JavaScript using HTML5 Canvas.

@@ -5,3 +5,6 @@ Guess Whomst? is an implementation of Guess Who in an online environment with fu
 
 ## Implementation
 The application back-end is built in Python using the Django web framework, and linked to an SQLite database for storage of active game sessions. The front-end is built in JavaScript using HTML5 Canvas.
+
+![alt text](https://github.com/dy27/guess-whomst//blob/master/interface_images/interface_1.jpg?raw=true)
+![alt text](https://github.com/dy27/guess-whomst//blob/master/interface_images/interface_2.jpg?raw=true)
